@@ -1,4 +1,5 @@
 import config from "../../config";
+import { createToken } from "../../utils/tokenRelatedItems";
 import { IUser } from "./user.interface";
 import user from "./user.model";
 import { generateOtp } from "./user.utils";
@@ -11,7 +12,9 @@ const registerUser = async (userInfo: IUser) => {
   }
 
   const result = await user.create(userInfo);
-  return result;
+  const token = createToken(result);
+
+  return token;
 };
 
 const requestPasswordReset = async (email: string) => {
@@ -42,7 +45,7 @@ const verifyOtp = async (email: string, otp: string) => {
   ) {
     throw new Error("Invalid or expired OTP");
   }
-  
+
   await user.findOneAndUpdate(
     { email },
     { $set: { otpVerified: true } },

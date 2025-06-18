@@ -1,3 +1,4 @@
+import { createToken } from "../../utils/tokenRelatedItems";
 import user from "../user/user.model";
 import { IAuth } from "./auth.interface";
 import bcrypt from "bcrypt";
@@ -17,7 +18,8 @@ const loginUser = async (loginInfo: IAuth) => {
     throw Error("Password didn't match");
   }
 
-  return isUserExist;
+  const token = createToken(isUserExist);
+  return token;
 };
 
 export const authServices = {
