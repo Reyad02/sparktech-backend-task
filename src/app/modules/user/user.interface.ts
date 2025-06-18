@@ -3,4 +3,7 @@ export interface IUser {
   password: string;
   profileImg?: string;
   userName: string;
+  otp?: string;
+  otpExpiry?: Date;
+  otpVerified?: boolean;
 }

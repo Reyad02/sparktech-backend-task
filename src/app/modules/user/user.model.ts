@@ -8,6 +8,9 @@ const userSchema = new Schema<IUser>(
     password: { type: String, required: true },
     profileImg: { type: String },
     userName: { type: String, required: true },
+    otp: { type: String },
+    otpExpiry: { type: String },
+    otpVerified: { type: Boolean },
   },
   { timestamps: true }
 );

@@ -6,7 +6,7 @@ const signin = async (req: Request, res: Response) => {
   try {
     const validateAuthInfo = authValidation.parse(req?.body);
     const result = await authServices.loginUser(validateAuthInfo);
-    res.json({
+    res.status(200).json({
       success: true,
       message: "checked",
       data: result,
