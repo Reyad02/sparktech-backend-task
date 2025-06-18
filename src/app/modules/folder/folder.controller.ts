@@ -7,7 +7,7 @@ const createFolder = async (req: Request, res: Response) => {
     res.status(201).json({
       success: true,
       message: "Folder created in successfully",
-      data: "",
+      data: result,
     });
   } catch (err: any) {
     res.json({

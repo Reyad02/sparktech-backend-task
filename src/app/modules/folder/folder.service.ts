@@ -10,6 +10,7 @@ const createFolder = async (folderInfo: IFOlder, user: JwtPayload) => {
     name,
     user: new Types.ObjectId(user._id),
   });
+  return result;
 };
 
 export const folderServices = {
