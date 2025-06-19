@@ -9,7 +9,8 @@ export interface IUser {
   otp?: string;
   otpExpiry?: Date;
   otpVerified?: boolean;
-  googleId?:string;
-  storageUsed?:number;
-  storageLimit?:number
+  googleId?: string;
+  storageUsed?: number;
+  storageLimit?: number;
+  privateFolderPass?: string;
 }

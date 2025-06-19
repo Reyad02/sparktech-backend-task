@@ -7,7 +7,6 @@ const fileSchema = new Schema<IFile>(
     user: { type: Schema.Types.ObjectId, ref: "user", required: true },
     folder: { type: Schema.Types.ObjectId, ref: "folder", required: true },
     isFavorite: { type: Boolean, default: false },
-    isPrivate: { type: Boolean, default: false },
     size: { type: Number, required: true },
     type: { type: String, enum: ["image", "pdf", "note"], required: true },
   },
