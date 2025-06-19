@@ -11,7 +11,27 @@ const registerUser = async (userInfo: IUser) => {
     throw new Error("User already exist");
   }
 
+  const passHash = await bcrypt.hash(
+    userInfo.password,
+    Number(config.saltRounds)
+  );
+  userInfo.password = passHash;
+
   const result = await user.create(userInfo);
+  const token = createToken(result);
+
+  return token;
+};
+
+const registerUserWithGoogle = async (userInfo: any) => {
+  const { email, name, googleId, profileImg } = userInfo;
+
+  const isUserExist = await user.findOne({ email });
+  if (isUserExist) {
+    throw new Error("User already exist");
+  }
+
+  const result = await user.create({ email, name, googleId, profileImg });
   const token = createToken(result);
 
   return token;
@@ -77,4 +97,5 @@ export const userServices = {
   requestPasswordReset,
   verifyOtp,
   resetPassword,
+  registerUserWithGoogle,
 };

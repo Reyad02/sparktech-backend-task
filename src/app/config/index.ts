@@ -9,5 +9,5 @@ export default {
   saltRounds: process.env.SALT_ROUNDS,
   jwt_secret: process.env.JWT_SECRET,
   jwt_expiration: process.env.JWT_EXPIRED,
-
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
 };

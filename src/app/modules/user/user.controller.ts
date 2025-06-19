@@ -24,6 +24,23 @@ const registerUser = async (req: Request, res: Response) => {
   }
 };
 
+const registerUserWithGoogle = async (req: Request, res: Response) => {
+  try {
+    const result = await userServices.registerUserWithGoogle(req.body);
+    res.status(201).json({
+      success: true,
+      message: "User registered in successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    res.json({
+      success: false,
+      message: err?.message,
+      stack: err?.stack,
+    });
+  }
+};
+
 const requestReset = async (req: Request, res: Response) => {
   try {
     const userEmail = emailValidation.parse(req?.body);
@@ -50,7 +67,10 @@ const verifyOtp = async (req: Request, res: Response) => {
 const resetPassword = async (req: Request, res: Response) => {
   try {
     const userEmail = emailValidation.parse({ email: req.body.email });
-    const result = await userServices.resetPassword(userEmail.email, req.body?.newPassword);
+    const result = await userServices.resetPassword(
+      userEmail.email,
+      req.body?.newPassword
+    );
     res
       .status(200)
       .json({ success: true, message: "password successfully", data: result });
@@ -64,4 +84,5 @@ export const userControllers = {
   requestReset,
   verifyOtp,
   resetPassword,
+  registerUserWithGoogle,
 };

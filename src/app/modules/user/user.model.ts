@@ -1,23 +1,19 @@
 import { model, Schema } from "mongoose";
 import { IUser } from "./user.interface";
-import bcrypt from "bcrypt";
-import config from "../../config";
+
 const userSchema = new Schema<IUser>(
   {
     email: { type: String, required: true },
-    password: { type: String, required: true },
+    password: { type: String },
     profileImg: { type: String },
-    userName: { type: String, required: true },
+    userName: { type: String },
     otp: { type: String },
     otpExpiry: { type: String },
     otpVerified: { type: Boolean },
+    googleId: { type: String },
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
-  this.password = await bcrypt.hash(this.password, Number(config.saltRounds));
-  next();
-});
 const user = model("user", userSchema);
 export default user;
