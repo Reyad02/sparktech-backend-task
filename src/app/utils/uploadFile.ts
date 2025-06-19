@@ -1,6 +1,8 @@
 import { Request } from "express";
 import multer, { FileFilterCallback } from "multer";
 import path from "path";
+import cloudinary from "../config/cloudinary.config";
+import { UploadApiResponse } from "cloudinary";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -30,3 +32,19 @@ const fileFilter = (
 };
 
 export const upload = multer({ storage, fileFilter });
+
+export const sendImageToCloudinary = (
+  imagePath: string,
+  publicId: string
+): Promise<UploadApiResponse> => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload(
+      imagePath,
+      { public_id: publicId },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result as UploadApiResponse);
+      }
+    );
+  });
+};

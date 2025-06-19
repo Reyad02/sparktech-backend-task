@@ -13,3 +13,4 @@ export const emailValidation = z.object({
 export const otpValidation = z.object({
   otp: z.string({ required_error: "OTP required" }).length(6),
 });
+

@@ -10,4 +10,7 @@ export default {
   jwt_secret: process.env.JWT_SECRET,
   jwt_expiration: process.env.JWT_EXPIRED,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  cloudinary_cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+  cloudinary_apiKey: process.env.CLOUDINARY_API_KEY,
+  cloudinary_secretKey: process.env.CLOUDINARY_SECRET_KEY,
 };

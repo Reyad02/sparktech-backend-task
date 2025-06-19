@@ -79,10 +79,72 @@ const resetPassword = async (req: Request, res: Response) => {
   }
 };
 
+const update = async (req: Request, res: Response) => {
+  try {
+    const result = await userServices.update(
+      req.user,
+      req?.body?.userName,
+      req?.file
+    );
+    res.status(200).json({
+      success: true,
+      message: "Info updated in successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    res.json({
+      success: false,
+      message: err?.message,
+      stack: err?.stack,
+    });
+  }
+};
+
+const changePassword = async (req: Request, res: Response) => {
+  try {
+    const result = await userServices.changePassword(
+      req.body.currentPassword,
+      req.body.newPassword,
+      req.user
+    );
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    res.json({
+      success: false,
+      message: err?.message,
+      stack: err?.stack,
+    });
+  }
+};
+
+const deleteAccount = async (req: Request, res: Response) => {
+  try {
+    const result = await userServices.deleteAccount(req.user);
+    res.status(200).json({
+      success: true,
+      message: "Delete account successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    res.json({
+      success: false,
+      message: err?.message,
+      stack: err?.stack,
+    });
+  }
+};
+
 export const userControllers = {
   registerUser,
   requestReset,
   verifyOtp,
   resetPassword,
   registerUserWithGoogle,
+  update,
+  changePassword,
+  deleteAccount
 };
