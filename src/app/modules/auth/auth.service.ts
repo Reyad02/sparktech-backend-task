@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 const loginUser = async (loginInfo: IAuth) => {
   const isUserExist = await user.findOne({ email: loginInfo?.email });
   if (!isUserExist) {
-    throw Error("User doesn't exist");
+    throw new Error("User doesn't exist");
   }
 
   const isPassMatch = await bcrypt.compare(
@@ -15,7 +15,7 @@ const loginUser = async (loginInfo: IAuth) => {
   );
 
   if (!isPassMatch) {
-    throw Error("Password didn't match");
+    throw new Error("Password didn't match");
   }
 
   const token = createToken(isUserExist);

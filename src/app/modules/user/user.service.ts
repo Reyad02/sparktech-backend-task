@@ -8,7 +8,7 @@ import bcrypt from "bcrypt";
 const registerUser = async (userInfo: IUser) => {
   const isUserExist = await user.findOne({ email: userInfo?.email });
   if (isUserExist) {
-    throw Error("User already exist");
+    throw new Error("User already exist");
   }
 
   const result = await user.create(userInfo);

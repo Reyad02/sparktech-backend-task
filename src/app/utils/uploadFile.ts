@@ -19,7 +19,8 @@ const fileFilter = (
   if (
     file.mimetype.startsWith("image/") ||
     file.mimetype === "application/pdf" ||
-    file.mimetype === "text/plain"
+    file.mimetype ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   ) {
     cb(null, true);
   } else {

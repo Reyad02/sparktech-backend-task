@@ -9,17 +9,17 @@ const auththentication = () => {
     try {
       const token = req.headers.authorization;
       if (!token) {
-        throw Error('You can not see this page');
+        throw new Error('You can not see this page');
       }
       const decodedToken = verifyToken(token);
       if (!decodedToken) {
-        throw Error('You can not see this page');
+        throw new Error('You can not see this page');
       }
       const { email, _id } = decodedToken;
 
       const existUser = User.findOne({ email: email });
       if (!existUser) {
-        throw Error('You can not see this page');
+        throw new Error('You can not see this page');
       }
 
       req.user = decodedToken as JwtPayload;

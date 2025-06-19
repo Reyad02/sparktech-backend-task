@@ -16,5 +16,32 @@ fileRoutes.post(
   },
   fileControllers.upload
 );
+fileRoutes.get("/pdf", auththentication(), fileControllers.getAllPdf);
+fileRoutes.get("/images", auththentication(), fileControllers.getAllImages);
+fileRoutes.get("/notes", auththentication(), fileControllers.getAllNotes);
+fileRoutes.get("/:id", auththentication(), fileControllers.getFile);
+fileRoutes.patch("/fav/:favId", auththentication(), fileControllers.favorite);
+fileRoutes.patch("/cody/:fileId", auththentication(), fileControllers.copyFile);
+fileRoutes.patch(
+  "/duplicate/:fileId",
+  auththentication(),
+  fileControllers.duplicateFile
+);
+fileRoutes.patch(
+  "/rename/:fileId",
+  auththentication(),
+  fileControllers.renameFile
+);
+fileRoutes.delete(
+  "/delete/:fileId",
+  auththentication(),
+  fileControllers.deleteFile
+);
+fileRoutes.get(
+  "/recent-files",
+  auththentication(),
+  fileControllers.getRecentFiles
+);
+
 
 export default fileRoutes;
