@@ -3,34 +3,72 @@ import { IFile } from "./file.interface";
 import { JwtPayload } from "jsonwebtoken";
 import path from "path";
 import { formatFileSize } from "../../utils/fileSizeFormate";
+import folder from "../folder/folder.model";
+import user from "../user/user.model";
+import mongoose from "mongoose";
 
 const upload = async (fileInfo: IFile, file: any, cur_user: JwtPayload) => {
-  let detectedType: string | null = null;
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  console.log(file.mimetype);
-  if (file.mimetype.startsWith("image/")) {
-    detectedType = "image";
-  } else if (file.mimetype === "application/pdf") {
-    detectedType = "pdf";
-  } else if (
-    file.mimetype ===
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  ) {
-    detectedType = "note";
+  try {
+    const userData = await user.findById(cur_user._id).session(session);
+    if (!userData) {
+      throw new Error("User not found");
+    }
+
+    const newFileSize = file.size;
+    const totalAfterUpload = userData.storageUsed + newFileSize;
+    const storageLimit = userData?.storageLimit ?? 15 * 1024 * 1024 * 1024;
+
+    if (totalAfterUpload > storageLimit) {
+      throw new Error("Storage limit exceeded. You have reached 15 GB usage.");
+    }
+
+    let detectedType: string | null = null;
+    if (file.mimetype.startsWith("image/")) {
+      detectedType = "image";
+    } else if (file.mimetype === "application/pdf") {
+      detectedType = "pdf";
+    } else if (
+      file.mimetype ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      detectedType = "note";
+    }
+
+    if (!detectedType) {
+      throw new Error("File type invalid");
+    }
+
+    const result = await fileModel.create(
+      [
+        {
+          name: file.originalname,
+          folder: fileInfo.folder,
+          user: cur_user._id,
+          size: newFileSize,
+          type: detectedType,
+        },
+      ],
+      { session }
+    );
+
+    await user.updateOne(
+      { _id: userData._id },
+      { $inc: { storageUsed: newFileSize } },
+      { session }
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return result[0];
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
   }
-
-  if (!detectedType) {
-    throw new Error("File type invalid");
-  }
-
-  const result = await fileModel.create({
-    name: file.originalname,
-    folder: fileInfo.folder,
-    user: cur_user._id,
-    size: file.size,
-    type: detectedType,
-  });
-  return result;
 };
 
 const favorite = async (favId: string, cur_user: JwtPayload) => {
@@ -260,7 +298,15 @@ const getFilesByDate = async (
     },
   });
 
-  return files;
+  const folders = await folder.find({
+    user: cur_user._id,
+    createdAt: {
+      $gte: startOfDay,
+      $lte: endOfDay,
+    },
+  });
+
+  return { files, folders };
 };
 
 export const fileServices = {

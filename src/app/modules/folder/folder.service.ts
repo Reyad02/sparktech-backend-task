@@ -23,34 +23,7 @@ const getAllFolders = async (user: JwtPayload) => {
   return result;
 };
 
-const getFoldersByDate = async (
-  cur_user: JwtPayload,
-  date: string | undefined
-) => {
-  if (!date) {
-    throw new Error("Date required");
-  }
-  const modifiedDate = new Date(date);
-  if (isNaN(modifiedDate.getTime())) {
-    throw new Error("Invalid date");
-  }
-
-  const startOfDay = new Date(modifiedDate.setHours(0, 0, 0, 0));
-  const endOfDay = new Date(modifiedDate.setHours(23, 59, 59, 999));
-
-  const files = await folder.find({
-    user: cur_user._id,
-    createdAt: {
-      $gte: startOfDay,
-      $lte: endOfDay,
-    },
-  });
-
-  return files;
-};
-
 export const folderServices = {
   createFolder,
   getAllFolders,
-  getFoldersByDate,
 };

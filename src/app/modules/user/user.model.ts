@@ -11,6 +11,8 @@ const userSchema = new Schema<IUser>(
     otpExpiry: { type: String },
     otpVerified: { type: Boolean },
     googleId: { type: String },
+    storageUsed: { type: Number, default: 0 }, 
+    storageLimit: { type: Number, default: 15 * 1024 * 1024 * 1024 }, 
   },
   { timestamps: true }
 );
