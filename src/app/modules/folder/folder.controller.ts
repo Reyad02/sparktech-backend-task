@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { folderServices } from "./folder.service";
 
-const createFolder = async (req: Request, res: Response) => {
+const createFolder = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await folderServices.createFolder(req.body, req.user);
     res.status(201).json({
@@ -10,15 +10,11 @@ const createFolder = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+      next(err);
   }
 };
 
-const getAllFolders = async (req: Request, res: Response) => {
+const getAllFolders = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await folderServices.getAllFolders(req.user);
     res.status(200).json({
@@ -27,15 +23,11 @@ const getAllFolders = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+      next(err);
   }
 };
 
-const setSecureFolder = async (req: Request, res: Response) => {
+const setSecureFolder = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const { privateFolderPass } = req.body;
@@ -50,15 +42,11 @@ const setSecureFolder = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+      next(err);
   }
 };
 
-const getPrivateFolderItems = async (req: Request, res: Response) => {
+const getPrivateFolderItems = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const { privateFolderPass } = req.body;
@@ -73,11 +61,7 @@ const getPrivateFolderItems = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+      next(err);
   }
 };
 

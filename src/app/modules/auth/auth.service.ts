@@ -1,3 +1,4 @@
+import { CustomError } from "../../error/CustomError";
 import { createToken } from "../../utils/tokenRelatedItems";
 import user from "../user/user.model";
 import { IAuth } from "./auth.interface";
@@ -6,7 +7,7 @@ import bcrypt from "bcrypt";
 const loginUser = async (loginInfo: IAuth) => {
   const isUserExist = await user.findOne({ email: loginInfo?.email });
   if (!isUserExist) {
-    throw new Error("User doesn't exist");
+    throw new CustomError("User not found", 404);
   }
 
   const isPassMatch = await bcrypt.compare(
@@ -15,7 +16,7 @@ const loginUser = async (loginInfo: IAuth) => {
   );
 
   if (!isPassMatch) {
-    throw new Error("Password didn't match");
+    throw new CustomError("Password didn't match", 401);
   }
 
   const token = createToken(isUserExist);

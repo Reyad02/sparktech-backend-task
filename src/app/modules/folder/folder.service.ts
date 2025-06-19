@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import config from "../../config";
 import user from "../user/user.model";
 import fileModel from "../file/file.model";
+import { CustomError } from "../../error/CustomError";
 
 const createFolder = async (folderInfo: IFOlder, user: JwtPayload) => {
   const { name } = folderInfo;
@@ -21,7 +22,7 @@ const getAllFolders = async (user: JwtPayload) => {
   const result = await folder.find({ user: user._id });
 
   if (!result) {
-    throw new Error("Folders not found");
+    throw new CustomError("Folders not found", 404);
   }
 
   return result;
@@ -34,7 +35,7 @@ const getPrivateFolderItems = async (
 ) => {
   const userDoc = await user.findById(userPayload._id);
   if (!userDoc || !userDoc.privateFolderPass) {
-    throw new Error("User not found or password not set");
+    throw new CustomError("User not found or password not set", 403);
   }
 
   const folderDoc = await folder.findOne({
@@ -44,7 +45,7 @@ const getPrivateFolderItems = async (
   });
 
   if (!folderDoc) {
-    throw new Error("Folder is not secure or doesn't exist");
+    throw new CustomError("Folder is not secure or doesn't exist", 404);
   }
 
   const isPasswordMatched = await bcrypt.compare(
@@ -53,7 +54,7 @@ const getPrivateFolderItems = async (
   );
 
   if (!isPasswordMatched) {
-    throw new Error("Password not matched");
+    throw new CustomError("Password didn't match", 401);
   }
 
   const files = await fileModel.find({
@@ -81,7 +82,7 @@ const setSecureFolder = async (
       .session(session);
 
     if (!isFolderExist) {
-      throw new Error("Folder not found");
+      throw new CustomError("Folders not found", 404);
     }
 
     const passHash = await bcrypt.hash(

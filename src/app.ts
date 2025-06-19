@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import router from "./app/routes";
+import { errorHandler } from "./app/middleware/errorHandler";
 
 const app = express();
 
@@ -13,11 +14,13 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
 
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
-});
+app.use(
+  errorHandler as (
+    err: any,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => void
+);
 
 export default app;

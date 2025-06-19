@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { fileServices } from "./file.service";
 
-const upload = async (req: Request, res: Response) => {
+const upload = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await fileServices.upload(req.body, req?.file, req.user);
     res.status(201).json({
@@ -10,15 +10,11 @@ const upload = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const favorite = async (req: Request, res: Response) => {
+const favorite = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await fileServices.favorite(req.params.favId, req.user);
     res.status(200).json({
@@ -27,15 +23,11 @@ const favorite = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const copyFile = async (req: Request, res: Response) => {
+const copyFile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await fileServices.copyFile(req.params.fileId, req.user);
     res.status(200).json({
@@ -44,15 +36,15 @@ const copyFile = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const duplicateFile = async (req: Request, res: Response) => {
+const duplicateFile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const result = await fileServices.duplicateFile(
       req.params.fileId,
@@ -64,15 +56,11 @@ const duplicateFile = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const renameFile = async (req: Request, res: Response) => {
+const renameFile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await fileServices.renameFile(
       req.params.fileId,
@@ -85,15 +73,11 @@ const renameFile = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const deleteFile = async (req: Request, res: Response) => {
+const deleteFile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await fileServices.deleteFile(req.params.fileId, req.user);
     res.status(200).json({
@@ -102,15 +86,15 @@ const deleteFile = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const getAllImages = async (req: Request, res: Response) => {
+const getAllImages = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const result = await fileServices.getAllImages(req.user);
     res.status(200).json({
@@ -119,15 +103,11 @@ const getAllImages = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const getAllNotes = async (req: Request, res: Response) => {
+const getAllNotes = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await fileServices.getAllNotes(req.user);
     res.status(200).json({
@@ -136,15 +116,11 @@ const getAllNotes = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const getAllPdf = async (req: Request, res: Response) => {
+const getAllPdf = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await fileServices.getAllPdf(req.user);
     res.status(200).json({
@@ -153,15 +129,11 @@ const getAllPdf = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const getFile = async (req: Request, res: Response) => {
+const getFile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await fileServices.getFile(req.user, req.params.id);
     res.status(200).json({
@@ -170,15 +142,15 @@ const getFile = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const getRecentFiles = async (req: Request, res: Response) => {
+const getRecentFiles = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const result = await fileServices.getRecentFiles(req.user);
     res.status(200).json({
@@ -187,15 +159,15 @@ const getRecentFiles = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const getNotesInfo = async (req: Request, res: Response) => {
+const getNotesInfo = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const result = await fileServices.getNotesInfo(req.user);
     res.status(200).json({
@@ -204,15 +176,11 @@ const getNotesInfo = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const getPdfsInfo = async (req: Request, res: Response) => {
+const getPdfsInfo = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await fileServices.getPdfsInfo(req.user);
     res.status(200).json({
@@ -221,15 +189,15 @@ const getPdfsInfo = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const getImagesInfo = async (req: Request, res: Response) => {
+const getImagesInfo = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const result = await fileServices.getImagesInfo(req.user);
     res.status(200).json({
@@ -238,15 +206,11 @@ const getImagesInfo = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const getSummary = async (req: Request, res: Response) => {
+const getSummary = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await fileServices.getSummary(req.user);
     res.status(200).json({
@@ -255,15 +219,15 @@ const getSummary = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const getFilesByDate = async (req: Request, res: Response) => {
+const getFilesByDate = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { date } = req.query;
     const result = await fileServices.getFilesByDate(req.user, date as string);
@@ -273,11 +237,7 @@ const getFilesByDate = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 

@@ -18,7 +18,11 @@ userRoutes.patch(
   auththentication(),
   upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
-    req.body = JSON.parse(req.body?.data);
+    if (req.body && req.body.data) {
+      req.body = JSON.parse(req.body?.data);
+    } else {
+      req.body = {};
+    }
     next();
   },
   userControllers.update

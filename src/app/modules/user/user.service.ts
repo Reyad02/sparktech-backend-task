@@ -7,11 +7,12 @@ import { generateOtp } from "./user.utils";
 import bcrypt from "bcrypt";
 import { sendImageToCloudinary } from "../../utils/uploadFile";
 import fs from "fs/promises";
+import { CustomError } from "../../error/CustomError";
 
 const registerUser = async (userInfo: IUser) => {
   const isUserExist = await user.findOne({ email: userInfo?.email });
   if (isUserExist) {
-    throw new Error("User already exist");
+    throw new CustomError("User already exists", 409);
   }
 
   const passHash = await bcrypt.hash(
@@ -31,7 +32,7 @@ const registerUserWithGoogle = async (userInfo: any) => {
 
   const isUserExist = await user.findOne({ email });
   if (isUserExist) {
-    throw new Error("User already exist");
+    throw new CustomError("User already exists", 409);
   }
 
   const result = await user.create({ email, name, googleId, profileImg });
@@ -42,8 +43,7 @@ const registerUserWithGoogle = async (userInfo: any) => {
 
 const requestPasswordReset = async (email: string) => {
   const isUserExist = await user.findOne({ email });
-  if (!isUserExist) throw new Error("User not found");
-
+  if (!isUserExist) throw new CustomError("User not found", 404);
   const otp = generateOtp();
   const otpExpiry = new Date(Date.now() + 50 * 60000);
 
@@ -53,7 +53,7 @@ const requestPasswordReset = async (email: string) => {
     { new: true }
   );
 
-  return result;
+  return {otp};
 };
 
 const verifyOtp = async (email: string, otp: string) => {
@@ -66,7 +66,7 @@ const verifyOtp = async (email: string, otp: string) => {
     !isUserExist.otpExpiry ||
     new Date() > isUserExist.otpExpiry
   ) {
-    throw new Error("Invalid or expired OTP");
+    throw new CustomError("Invalid or expired OTP", 401);
   }
 
   await user.findOneAndUpdate(
@@ -80,10 +80,10 @@ const verifyOtp = async (email: string, otp: string) => {
 
 const resetPassword = async (email: string, newPassword: string) => {
   const isUserExist = await user.findOne({ email });
-  if (!isUserExist) throw new Error("User not found");
+  if (!isUserExist) throw new CustomError("User not found", 404);
 
   if (!isUserExist.otpVerified) {
-    throw new Error("OTP not verified. Cannot reset password.");
+    throw new CustomError("OTP not verified. Cannot reset password.", 403);
   }
   const hashed = await bcrypt.hash(newPassword, Number(config.saltRounds));
 
@@ -102,11 +102,11 @@ const update = async (
 ) => {
   const isUserExist = await user.findById(cur_user._id);
   if (!isUserExist) {
-    throw new Error("User doesn't exist");
+    throw new CustomError("User not found", 404);
   }
 
   if (!userName && !file) {
-    throw new Error("No data provided to update");
+    throw new CustomError("No data provided to update", 400);
   }
 
   const data: Partial<{ userName: string; profileImg: string }> = {};
@@ -139,7 +139,7 @@ const changePassword = async (
 ) => {
   const isUserExist = await user.findById(cur_user._id);
   if (!isUserExist) {
-    throw new Error("User doesn't exist");
+    throw new CustomError("User doesn't exist", 404);
   }
 
   const isPasswordMatch = await bcrypt.compare(
@@ -147,7 +147,7 @@ const changePassword = async (
     isUserExist.password
   );
   if (!isPasswordMatch) {
-    throw new Error("Current password is incorrect");
+    throw new CustomError("Current password is incorrect", 401);
   }
 
   const hashedPassword = await bcrypt.hash(
@@ -170,7 +170,7 @@ const changePassword = async (
 const deleteAccount = async (cur_user: JwtPayload) => {
   const isUserExist = await user.findById(cur_user._id);
   if (!isUserExist) {
-    throw new Error("User not found");
+    throw new CustomError("User not found", 404);
   }
 
   // Delete related user data (e.g., files)
@@ -193,5 +193,5 @@ export const userServices = {
   registerUserWithGoogle,
   update,
   changePassword,
-  deleteAccount
+  deleteAccount,
 };

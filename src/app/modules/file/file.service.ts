@@ -6,6 +6,7 @@ import { formatFileSize } from "../../utils/fileSizeFormate";
 import folder from "../folder/folder.model";
 import user from "../user/user.model";
 import mongoose from "mongoose";
+import { CustomError } from "../../error/CustomError";
 
 const upload = async (fileInfo: IFile, file: any, cur_user: JwtPayload) => {
   const session = await mongoose.startSession();
@@ -14,7 +15,7 @@ const upload = async (fileInfo: IFile, file: any, cur_user: JwtPayload) => {
   try {
     const userData = await user.findById(cur_user._id).session(session);
     if (!userData) {
-      throw new Error("User not found");
+      throw new CustomError("User not found", 404);
     }
 
     const newFileSize = file.size;
@@ -22,7 +23,10 @@ const upload = async (fileInfo: IFile, file: any, cur_user: JwtPayload) => {
     const storageLimit = userData?.storageLimit ?? 15 * 1024 * 1024 * 1024;
 
     if (totalAfterUpload > storageLimit) {
-      throw new Error("Storage limit exceeded. You have reached 15 GB usage.");
+      throw new CustomError(
+        "Storage limit exceeded. You have reached 15 GB usage.",
+        403
+      );
     }
 
     let detectedType: string | null = null;
@@ -38,7 +42,7 @@ const upload = async (fileInfo: IFile, file: any, cur_user: JwtPayload) => {
     }
 
     if (!detectedType) {
-      throw new Error("File type invalid");
+      throw new CustomError("File type invalid", 400);
     }
 
     const result = await fileModel.create(
@@ -79,7 +83,7 @@ const favorite = async (favId: string, cur_user: JwtPayload) => {
   );
 
   if (!result) {
-    throw new Error("File not found");
+    throw new CustomError("File not found", 404);
   }
 
   return result;
@@ -87,7 +91,7 @@ const favorite = async (favId: string, cur_user: JwtPayload) => {
 
 const copyFile = async (fileId: string, cur_user: JwtPayload) => {
   const isFileExist = await fileModel.findById(fileId);
-  if (!isFileExist) throw new Error("File not found");
+  if (!isFileExist) throw new CustomError("File not found", 404);
 
   const ext = path.extname(isFileExist.name);
   const baseName = path.basename(isFileExist.name, ext);
@@ -113,7 +117,7 @@ const copyFile = async (fileId: string, cur_user: JwtPayload) => {
 
 const duplicateFile = async (fileId: string, cur_user: JwtPayload) => {
   const isFileExist = await fileModel.findById(fileId);
-  if (!isFileExist) throw new Error("File not found");
+  if (!isFileExist) throw new CustomError("File not found", 404);
 
   const duplicate = await fileModel.create({
     name: isFileExist.name,
@@ -132,7 +136,7 @@ const renameFile = async (
   fileName: string
 ) => {
   const isFileExist = await fileModel.findById(fileId);
-  if (!isFileExist) throw new Error("File not found");
+  if (!isFileExist) throw new CustomError("File not found", 404);
   const newName = fileName + path.extname(isFileExist.name);
 
   const result = await fileModel.findOneAndUpdate(
@@ -151,7 +155,7 @@ const deleteFile = async (fileId: string, cur_user: JwtPayload) => {
   );
 
   if (!result) {
-    throw new Error("File not found");
+    throw new CustomError("File not found", 404);
   }
 
   return result;
@@ -161,7 +165,7 @@ const getAllImages = async (cur_user: JwtPayload) => {
   const result = await fileModel.find({ type: "image", user: cur_user._id });
 
   if (!result) {
-    throw new Error("Images not found");
+    throw new CustomError("Images not found", 404);
   }
 
   return result;
@@ -171,7 +175,7 @@ const getAllNotes = async (cur_user: JwtPayload) => {
   const result = await fileModel.find({ type: "note", user: cur_user._id });
 
   if (!result) {
-    throw new Error("Notes not found");
+    throw new CustomError("Notes not found", 404);
   }
 
   return result;
@@ -180,8 +184,8 @@ const getAllNotes = async (cur_user: JwtPayload) => {
 const getAllPdf = async (cur_user: JwtPayload) => {
   const result = await fileModel.find({ type: "pdf", user: cur_user._id });
 
-  if (!result || result.length === 0) {
-    throw new Error("Pdf not found");
+  if (!result) {
+    throw new CustomError("Pdf not found", 404);
   }
 
   return result;
@@ -191,7 +195,7 @@ const getFile = async (cur_user: JwtPayload, id: string) => {
   const result = await fileModel.findOne({ user: cur_user._id, _id: id });
 
   if (!result) {
-    throw new Error("File not found");
+    throw new CustomError("File not found", 404);
   }
 
   return result;
@@ -203,8 +207,8 @@ const getRecentFiles = async (cur_user: JwtPayload) => {
     .sort({ updatedAt: -1 })
     .limit(5);
 
-  if (!result || result.length === 0) {
-    throw new Error("No recent files found");
+  if (!result) {
+    throw new CustomError("No recent files found", 404);
   }
 
   return result;
@@ -280,11 +284,11 @@ const getFilesByDate = async (
   date: string | undefined
 ) => {
   if (!date) {
-    throw new Error("Date required");
+    throw new CustomError("Date required", 400);
   }
   const modifiedDate = new Date(date);
   if (isNaN(modifiedDate.getTime())) {
-    throw new Error("Invalid date");
+    throw new CustomError("Invalid date", 400);
   }
 
   const startOfDay = new Date(modifiedDate.setHours(0, 0, 0, 0));

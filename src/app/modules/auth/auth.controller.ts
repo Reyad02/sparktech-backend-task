@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { authServices } from "./auth.service";
 import { authValidation } from "./auth.validation";
 
-const signin = async (req: Request, res: Response) => {
+const signin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validateAuthInfo = authValidation.parse(req?.body);
     const result = await authServices.loginUser(validateAuthInfo);
@@ -12,14 +12,10 @@ const signin = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
 export const authControllers = {
-  signin
+  signin,
 };

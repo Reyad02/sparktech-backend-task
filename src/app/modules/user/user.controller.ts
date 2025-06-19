@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { userServices } from "./user.service";
 import {
   emailValidation,
@@ -6,7 +6,11 @@ import {
   userValidation,
 } from "./user.validation";
 
-const registerUser = async (req: Request, res: Response) => {
+const registerUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const registerUserInfo = userValidation.parse(req?.body);
     const result = await userServices.registerUser(registerUserInfo);
@@ -16,15 +20,15 @@ const registerUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const registerUserWithGoogle = async (req: Request, res: Response) => {
+const registerUserWithGoogle = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const result = await userServices.registerUserWithGoogle(req.body);
     res.status(201).json({
@@ -33,25 +37,25 @@ const registerUserWithGoogle = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const requestReset = async (req: Request, res: Response) => {
+const requestReset = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const userEmail = emailValidation.parse(req?.body);
     const result = await userServices.requestPasswordReset(userEmail?.email);
     res.status(200).json({ success: true, message: "OTP sent", data: result });
   } catch (err: any) {
-    res.json({ success: false, message: err.message, stack: err?.stack });
+    next(err);
   }
 };
 
-const verifyOtp = async (req: Request, res: Response) => {
+const verifyOtp = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userOtp = otpValidation.parse({ otp: req.body.otp });
     const userEmail = emailValidation.parse({ email: req.body.email });
@@ -61,10 +65,14 @@ const verifyOtp = async (req: Request, res: Response) => {
       .status(200)
       .json({ success: true, message: "OTP verified", data: result });
   } catch (err: any) {
-    res.json({ success: false, message: err.message, stack: err?.stack });
+    next(err);
   }
 };
-const resetPassword = async (req: Request, res: Response) => {
+const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const userEmail = emailValidation.parse({ email: req.body.email });
     const result = await userServices.resetPassword(
@@ -75,11 +83,11 @@ const resetPassword = async (req: Request, res: Response) => {
       .status(200)
       .json({ success: true, message: "password successfully", data: result });
   } catch (err: any) {
-    res.json({ success: false, message: err.message, stack: err?.stack });
+    next(err);
   }
 };
 
-const update = async (req: Request, res: Response) => {
+const update = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await userServices.update(
       req.user,
@@ -92,15 +100,15 @@ const update = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const changePassword = async (req: Request, res: Response) => {
+const changePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const result = await userServices.changePassword(
       req.body.currentPassword,
@@ -113,15 +121,15 @@ const changePassword = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
-const deleteAccount = async (req: Request, res: Response) => {
+const deleteAccount = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const result = await userServices.deleteAccount(req.user);
     res.status(200).json({
@@ -130,11 +138,7 @@ const deleteAccount = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err: any) {
-    res.json({
-      success: false,
-      message: err?.message,
-      stack: err?.stack,
-    });
+    next(err);
   }
 };
 
@@ -146,5 +150,5 @@ export const userControllers = {
   registerUserWithGoogle,
   update,
   changePassword,
-  deleteAccount
+  deleteAccount,
 };
