@@ -163,7 +163,7 @@ const getAllPdf = async (req: Request, res: Response) => {
 
 const getFile = async (req: Request, res: Response) => {
   try {
-    const result = await fileServices.getFile(req.user,req.params.id);
+    const result = await fileServices.getFile(req.user, req.params.id);
     res.status(200).json({
       success: true,
       message: "pdf retrieved successfully",
@@ -195,6 +195,92 @@ const getRecentFiles = async (req: Request, res: Response) => {
   }
 };
 
+const getNotesInfo = async (req: Request, res: Response) => {
+  try {
+    const result = await fileServices.getNotesInfo(req.user);
+    res.status(200).json({
+      success: true,
+      message: "Notes info retrieved successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    res.json({
+      success: false,
+      message: err?.message,
+      stack: err?.stack,
+    });
+  }
+};
+
+const getPdfsInfo = async (req: Request, res: Response) => {
+  try {
+    const result = await fileServices.getPdfsInfo(req.user);
+    res.status(200).json({
+      success: true,
+      message: "pdfs info retrieved successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    res.json({
+      success: false,
+      message: err?.message,
+      stack: err?.stack,
+    });
+  }
+};
+
+const getImagesInfo = async (req: Request, res: Response) => {
+  try {
+    const result = await fileServices.getImagesInfo(req.user);
+    res.status(200).json({
+      success: true,
+      message: "images info retrieved successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    res.json({
+      success: false,
+      message: err?.message,
+      stack: err?.stack,
+    });
+  }
+};
+
+const getSummary = async (req: Request, res: Response) => {
+  try {
+    const result = await fileServices.getSummary(req.user);
+    res.status(200).json({
+      success: true,
+      message: "Summary retrieved successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    res.json({
+      success: false,
+      message: err?.message,
+      stack: err?.stack,
+    });
+  }
+};
+
+const getFilesByDate = async (req: Request, res: Response) => {
+  try {
+    const { date } = req.query;
+    const result = await fileServices.getFilesByDate(req.user, date as string);
+    res.status(200).json({
+      success: true,
+      message: "Summary retrieved successfully",
+      data: result,
+    });
+  } catch (err: any) {
+    res.json({
+      success: false,
+      message: err?.message,
+      stack: err?.stack,
+    });
+  }
+};
+
 export const fileControllers = {
   upload,
   favorite,
@@ -206,5 +292,10 @@ export const fileControllers = {
   getAllNotes,
   getAllPdf,
   getFile,
-  getRecentFiles
+  getRecentFiles,
+  getNotesInfo,
+  getPdfsInfo,
+  getImagesInfo,
+  getSummary,
+  getFilesByDate,
 };

@@ -2,6 +2,7 @@ import fileModel from "./file.model";
 import { IFile } from "./file.interface";
 import { JwtPayload } from "jsonwebtoken";
 import path from "path";
+import { formatFileSize } from "../../utils/fileSizeFormate";
 
 const upload = async (fileInfo: IFile, file: any, cur_user: JwtPayload) => {
   let detectedType: string | null = null;
@@ -171,6 +172,97 @@ const getRecentFiles = async (cur_user: JwtPayload) => {
   return result;
 };
 
+const getNotesInfo = async (cur_user: JwtPayload) => {
+  const isNotesExist = await fileModel.find({
+    user: cur_user._id,
+    type: "note",
+  });
+  const totalSizeInBytes = isNotesExist.reduce(
+    (acc, singleFile) => acc + singleFile.size,
+    0
+  );
+
+  return {
+    count: isNotesExist.length,
+    totalSize: formatFileSize(totalSizeInBytes),
+  };
+};
+
+const getPdfsInfo = async (cur_user: JwtPayload) => {
+  const isPdfsExist = await fileModel.find({
+    user: cur_user._id,
+    type: "pdf",
+  });
+  const totalSizeInBytes = isPdfsExist.reduce(
+    (acc, singleFile) => acc + singleFile.size,
+    0
+  );
+
+  return {
+    count: isPdfsExist.length,
+    totalSize: formatFileSize(totalSizeInBytes),
+  };
+};
+
+const getImagesInfo = async (cur_user: JwtPayload) => {
+  const isimagessExist = await fileModel.find({
+    user: cur_user._id,
+    type: "image",
+  });
+
+  const totalSizeInBytes = isimagessExist.reduce(
+    (acc, singleFile) => acc + singleFile.size,
+    0
+  );
+
+  return {
+    count: isimagessExist.length,
+    totalSize: formatFileSize(totalSizeInBytes),
+  };
+};
+
+const getSummary = async (cur_user: JwtPayload) => {
+  const files = await fileModel.find({
+    user: cur_user._id,
+  });
+
+  const totalSizeInBytes = files.reduce(
+    (acc, singleFile) => acc + singleFile.size,
+    0
+  );
+
+  return {
+    count: files.length,
+    totalSize: formatFileSize(totalSizeInBytes),
+  };
+};
+
+const getFilesByDate = async (
+  cur_user: JwtPayload,
+  date: string | undefined
+) => {
+  if (!date) {
+    throw new Error("Date required");
+  }
+  const modifiedDate = new Date(date);
+  if (isNaN(modifiedDate.getTime())) {
+    throw new Error("Invalid date");
+  }
+
+  const startOfDay = new Date(modifiedDate.setHours(0, 0, 0, 0));
+  const endOfDay = new Date(modifiedDate.setHours(23, 59, 59, 999));
+
+  const files = await fileModel.find({
+    user: cur_user._id,
+    createdAt: {
+      $gte: startOfDay,
+      $lte: endOfDay,
+    },
+  });
+
+  return files;
+};
+
 export const fileServices = {
   upload,
   favorite,
@@ -183,4 +275,9 @@ export const fileServices = {
   getAllPdf,
   getFile,
   getRecentFiles,
+  getNotesInfo,
+  getPdfsInfo,
+  getImagesInfo,
+  getSummary,
+  getFilesByDate,
 };

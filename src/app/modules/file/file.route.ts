@@ -11,7 +11,6 @@ fileRoutes.post(
   upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
-    console.log("ok");
     next();
   },
   fileControllers.upload
@@ -19,7 +18,6 @@ fileRoutes.post(
 fileRoutes.get("/pdf", auththentication(), fileControllers.getAllPdf);
 fileRoutes.get("/images", auththentication(), fileControllers.getAllImages);
 fileRoutes.get("/notes", auththentication(), fileControllers.getAllNotes);
-fileRoutes.get("/:id", auththentication(), fileControllers.getFile);
 fileRoutes.patch("/fav/:favId", auththentication(), fileControllers.favorite);
 fileRoutes.patch("/cody/:fileId", auththentication(), fileControllers.copyFile);
 fileRoutes.patch(
@@ -42,6 +40,15 @@ fileRoutes.get(
   auththentication(),
   fileControllers.getRecentFiles
 );
-
+fileRoutes.get("/notes-info", auththentication(), fileControllers.getNotesInfo);
+fileRoutes.get("/pdf-info", auththentication(), fileControllers.getPdfsInfo);
+fileRoutes.get(
+  "/images-info",
+  auththentication(),
+  fileControllers.getImagesInfo
+);
+fileRoutes.get("/summary", auththentication(), fileControllers.getSummary);
+fileRoutes.get("/files-by-date", auththentication(), fileControllers.getFilesByDate);
+fileRoutes.get("/:id", auththentication(), fileControllers.getFile);
 
 export default fileRoutes;
